@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GitHub Style Diff Checker</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+        .textarea-container {
+            display: flex;
+            justify-content: center;
+            gap: 20px; /* Space between the textareas */
+            max-width: 800px; /* Max container width */
+            margin: 0 auto;
+        }
+        textarea {
+            width: 350px; /* Fixed width */
+            height: 200px; /* Increased height for better readability */
+        }
+        pre {
+            background-color: #f6f8fa;
+            padding: 10px;
+            border: 1px solid #e1e4e8;
+            white-space: pre-wrap;
+            width: 100%;
+            max-width: 800px;
+            margin: 20px auto;
+        }
+        .diff-added {
+            color: green;
+            font-weight: bold;
+        }
+        .diff-removed {
+            color: red;
+            font-weight: bold;
+        }
+        .diff-unchanged {
+            color: black;
+        }
+        button {
+            margin: 20px;
+            padding: 10px 20px;
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+    <h1>GitHub Style Diff Checker</h1>
+
+    <div class="textarea-container">
+        <div>
+            <label for="text1">Text 1 (Original):</label><br>
+            <textarea id="text1"></textarea>
+        </div>
+        <div>
+            <label for="text2">Text 2:</label><br>
+            <textarea id="text2"></textarea>
+        </div>
+    </div>
+
+    <button onclick="generateDiff()">Generate Diff</button>
+
+    <h2>Diff Output:</h2>
+    <pre id="diffOutput"></pre>
+
+    <!-- Include the diff library -->
+    <script src="https://cdn.jsdelivr.net/npm/diff@5.0.0/dist/diff.min.js"></script>
+    <script>
+        function escapeHtml(text) {
+            const map = {
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                '"': '&quot;',
+                "'": '&#039;'
+            };
+            return text.replace(/[&<>"']/g, m => map[m]);
+        }
+
+        function generateDiff() {
+            // Get the values of the two text areas
+            const text1 = document.getElementById("text1").value;
+            const text2 = document.getElementById("text2").value;
+
+            // Generate the word-based diff using the Diff library
+            const diff = Diff.diffWords(text1, text2);
+
+            // Prepare the diff output
+            let result = "";
+            diff.forEach(part => {
+                // Use green for additions, red for deletions, and black for unchanged parts
+                const color = part.added ? 'diff-added' :
+                              part.removed ? 'diff-removed' : 'diff-unchanged';
+                result += `<span class="${color}">${escapeHtml(part.value)}</span>`;
+            });
+
+            // Display the diff output
+            document.getElementById("diffOutput").innerHTML = result;
+        }
+    </script>
+</body>
+</html>
